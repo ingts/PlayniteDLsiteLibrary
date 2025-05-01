@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_LoginLabel">Log in</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_NameOptionLabel">Set name as</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_NameOption_WorkId">Work ID</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_NameOption_Name">Name</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_Language">Title Language</sys:String>
+    <sys:String x:Key="LOC_Login_LoggedIn">Authenticated</sys:String>
+    <sys:String x:Key="LOC_Login_NotLoggedIn">Requires authentication</sys:String>
+    <sys:String x:Key="LOC_Login_Error">Authentication failed</sys:String>
+</ResourceDictionary>

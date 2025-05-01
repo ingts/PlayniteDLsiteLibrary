@@ -1,0 +1,3 @@
+[submodule "DLsiteMetadata"]
+	path = DLsiteMetadata
+	url = https://github.com/Mysterken/DLsiteMetadata.git

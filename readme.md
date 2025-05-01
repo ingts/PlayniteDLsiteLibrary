@@ -1,0 +1,1 @@
+Plugin to load purchases from DLsite. Does not support DLsite Nest. Supports same options as [DLsiteMetadata](https://github.com/Mysterken/DLsiteMetadata)
