@@ -22,7 +22,7 @@ namespace DLsiteLibrary
         // Implementing Client adds ability to open it via special menu in playnite.
         // public override LibraryClient Client { get; } = new DLsiteLibraryClient();
 
-        private readonly Uri _dlsiteUri = new("https://www.dlsite.com/maniax/load/bought/product");
+        private readonly Uri _boughtsUrl = new("https://www.dlsite.com/maniax/load/bought/product");
 
         public DLsiteLibrary(IPlayniteAPI api) : base(api)
         {
@@ -42,18 +42,11 @@ namespace DLsiteLibrary
             }
 
             var cookieContainer = new CookieContainer();
-            cookieContainer.Add(_dlsiteUri, new Cookie("__DLsite_SID", settings.Settings.sId));
+            cookieContainer.Add(_boughtsUrl, new Cookie("__DLsite_SID", settings.Settings.sId));
             var handler = new HttpClientHandler { CookieContainer = cookieContainer };
             var httpClient = new HttpClient(handler);
 
-            var res = httpClient.GetAsync(_dlsiteUri).Result;
-            if (res.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                settings.Settings.sId = string.Empty;
-                PlayniteApi.Notifications.Add(new NotificationMessage("dlsite_expired", "Session Expired. Log in again",
-                    NotificationType.Error, () => OpenSettingsView()));
-                return [];
-            }
+            var res = httpClient.GetAsync(_boughtsUrl).Result;
 
             try
             {
@@ -66,6 +59,17 @@ namespace DLsiteLibrary
             }
 
             var boughtsResponse = Serialization.FromJson<BoughtsResponse>(res.Content.ReadAsStringAsync().Result);
+
+            // Returns 200 even if expired
+            if (boughtsResponse.Boughts.Count == 0)
+            {
+                settings.Settings.sId = string.Empty;
+                PlayniteApi.Notifications.Add(new NotificationMessage("dlsite_expired",
+                    "No products found. Session might have expired. Try logging in again.",
+                    NotificationType.Error, () => OpenSettingsView()));
+                return [];
+            }
+
             return boughtsResponse.Boughts.Select(s => new GameMetadata
             {
                 GameId = s,
