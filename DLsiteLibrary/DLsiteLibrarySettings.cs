@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using DLsiteMetadata;
+using DLsiteMetadata.Enums;
 using Playnite.SDK;
 using Playnite.SDK.Data;
 
@@ -35,15 +35,9 @@ namespace DLsiteLibrary
 
         private string _pageLanguage = "English";
 
-        [DontSerialize]
-        public List<string> AvailableSearchCategory { get; } =
-        [
-            "All categories",
-            "All ages Doujin / Indie Games",
-            "All ages PC Games",
-            "Adult Doujin / Indie Games",
-            "Adult H Games"
-        ];
+        private string _categoryMappingTarget = "Genres";
+        private string _supportedLanguagesMappingTarget = "None";
+        private bool _assignGameProductFormatToGenre = true;
 
         [DontSerialize]
         public List<string> AvailableLanguages { get; } =
@@ -106,6 +100,24 @@ namespace DLsiteLibrary
             set => SetValue(ref _includeFileFormat, value);
         }
 
+        public string CategoryMappingTarget
+        {
+            get => _categoryMappingTarget;
+            set => SetValue(ref _categoryMappingTarget, value);
+        }
+
+        public string SupportedLanguagesMappingTarget
+        {
+            get => _supportedLanguagesMappingTarget;
+            set => SetValue(ref _supportedLanguagesMappingTarget, value);
+        }
+
+        public bool AssignGameProductFormatToGenre
+        {
+            get => _assignGameProductFormatToGenre;
+            set => SetValue(ref _assignGameProductFormatToGenre, value);
+        }
+
         public SupportedLanguages GetSupportedLanguage()
         {
             return _pageLanguage switch
@@ -127,6 +139,21 @@ namespace DLsiteLibrary
                 _ => SupportedLanguages.en_US
             };
         }
+
+        [DontSerialize]
+        public List<string> AvailableCategoryMappingTarget { get; } =
+        [
+            "Genres",
+            "Tags"
+        ];
+
+        [DontSerialize]
+        public List<string> AvailableSupportedLanguagesMappingTarget { get; } =
+        [
+            "Genres",
+            "Tags",
+            "None"
+        ];
     }
 
     public class DLsiteLibrarySettingsViewModel : ObservableObject, ISettings

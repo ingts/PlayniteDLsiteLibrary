@@ -24,17 +24,23 @@ namespace DLsiteLibrary
         public override GameMetadata GetMetadata(Game game)
         {
             var gameMetadata = new GameMetadata();
-            DLsiteScrapperResult scrapperResult = _dLsiteScrapper.ScrapGamePage($"https://www.dlsite.com/home/work/=/product_id/{game.GameId}.html",
-                _settings.GetSupportedLanguage()).Result;
+            DLsiteScrapperResult scrapeResult = _dLsiteScrapper.ScrapGamePage(
+                $"https://www.dlsite.com/home/work/=/product_id/{game.GameId}.html",
+                _settings.GetSupportedLanguage(),
+                _settings.CategoryMappingTarget
+            ).Result;
 
-            gameMetadata.Description = scrapperResult.Description;
+            gameMetadata.Description = scrapeResult.Description;
             var features = new List<MetadataProperty>();
 
+            if (scrapeResult.GameProductFormat != null && !_settings.AssignGameProductFormatToGenre)
+                AddFeatures(scrapeResult.GameProductFormat);
+
             if (_settings.IncludeFileFormat)
-                AddFeatures(scrapperResult.FileFormat);
+                AddFeatures(scrapeResult.FileFormat);
 
             if (_settings.IncludeProductFormat)
-                AddFeatures(scrapperResult.ProductFormat);
+                AddFeatures(scrapeResult.ProductFormat);
 
             gameMetadata.Features = features.ToHashSet();
 
@@ -52,28 +58,36 @@ namespace DLsiteLibrary
                 }));
             }
 
-            gameMetadata.Name = scrapperResult.Title;
+            gameMetadata.Name = scrapeResult.Title;
 
-            if (scrapperResult.Age != null)
+            if (scrapeResult.Age != null)
             {
-                var age = scrapperResult.Age switch
+                var age = scrapeResult.Age switch
                 {
                     DLsiteScrapperResult.AgeRating.AllAges => "All ages",
                     DLsiteScrapperResult.AgeRating.RRated => "R-Rated",
                     DLsiteScrapperResult.AgeRating.Adult => "Adult",
                     _ => null
                 };
+
                 var ageRating = _playniteApi.Database.AgeRatings
                     .Where(x => x.Name is not null)
                     .FirstOrDefault(rating => rating.Name.Equals(age, StringComparison.OrdinalIgnoreCase));
                 MetadataProperty ageProperty = ageRating is null
-                    ? new MetadataNameProperty(age )
+                    ? new MetadataNameProperty(age)
                     : new MetadataIdProperty(ageRating.Id);
                 gameMetadata.AgeRatings = new[] { ageProperty }.ToHashSet();
-
             }
 
-            gameMetadata.Genres = scrapperResult.Genres == null ? [] : scrapperResult.Genres
+            scrapeResult.Genres = [];
+
+            if (scrapeResult.GameProductFormat != null && _settings.AssignGameProductFormatToGenre)
+                scrapeResult.Genres.AddRange(scrapeResult.GameProductFormat);
+
+            if (scrapeResult.SupportedLanguages != null && _settings.SupportedLanguagesMappingTarget == "Genres")
+                scrapeResult.Genres.AddRange(scrapeResult.SupportedLanguages);
+
+            gameMetadata.Genres = scrapeResult.Genres
                 .Select(genre => (genre, _playniteApi.Database.Genres.Where(x => x.Name is not null)
                     .FirstOrDefault(x => x.Name.Equals(genre, StringComparison.OrdinalIgnoreCase))))
                 .Select(MetadataProperty (tuple) =>
@@ -83,21 +97,47 @@ namespace DLsiteLibrary
                     return new MetadataNameProperty(genre);
                 })
                 .ToHashSet();
-            gameMetadata.Icon = new MetadataFile(scrapperResult.Icon);
+
+            if (scrapeResult.SupportedLanguages != null && _settings.SupportedLanguagesMappingTarget == "Tags")
+            {
+                scrapeResult.Tags ??= [];
+                scrapeResult.Tags?.AddRange(scrapeResult.SupportedLanguages);
+            }
+
+            if (scrapeResult.Tags != null)
+            {
+                gameMetadata.Tags = scrapeResult.Tags
+                    .Select(tag => (tag,
+                        _playniteApi.Database.Tags.Where(x => x.Name is not null)
+                            .FirstOrDefault(x => x.Name.Equals(tag, StringComparison.OrdinalIgnoreCase))))
+                    .Select(tuple =>
+                    {
+                        var (tag, property) = tuple;
+                        if (property is not null) return (MetadataProperty)new MetadataIdProperty(property.Id);
+                        return new MetadataNameProperty(tag);
+                    })
+                    .ToHashSet();
+            }
+
+            gameMetadata.Icon = new MetadataFile(scrapeResult.Icon);
 
 
             var staff = new List<string>();
+
             void AddStaff(IEnumerable<string> members)
             {
                 if (members != null) staff.AddRange(members);
             }
-            AddStaff(scrapperResult.Author);
-            if (scrapperResult.Circle != null && (scrapperResult.Author == null || !scrapperResult.Author.Contains(scrapperResult.Circle)))
-                staff.Add(scrapperResult.Circle);
-            if (_settings.IncludeIllustrators) AddStaff(scrapperResult.Illustrators);
-            if (_settings.IncludeScenarioWriters) AddStaff(scrapperResult.ScenarioWriters);
-            if (_settings.IncludeMusicCreators) AddStaff(scrapperResult.MusicCreators);
-            if (_settings.IncludeVoiceActors) AddStaff(scrapperResult.VoiceActors);
+
+            AddStaff(scrapeResult.Author);
+            if (scrapeResult.Circle != null &&
+                (scrapeResult.Author == null || !scrapeResult.Author.Contains(scrapeResult.Circle)))
+                staff.Add(scrapeResult.Circle);
+
+            if (_settings.IncludeIllustrators) AddStaff(scrapeResult.Illustrators);
+            if (_settings.IncludeScenarioWriters) AddStaff(scrapeResult.ScenarioWriters);
+            if (_settings.IncludeMusicCreators) AddStaff(scrapeResult.MusicCreators);
+            if (_settings.IncludeVoiceActors) AddStaff(scrapeResult.VoiceActors);
             gameMetadata.Developers = staff.Select(name =>
             {
                 var company = _playniteApi.Database.Companies
@@ -111,12 +151,13 @@ namespace DLsiteLibrary
 
             var links = new List<Link>();
 
-            if (scrapperResult.Links != null) links.AddRange(scrapperResult.Links.Select(link => new Link(link.Key, link.Value)));
+            if (scrapeResult.Links != null)
+                links.AddRange(scrapeResult.Links.Select(link => new Link(link.Key, link.Value)));
             gameMetadata.Links = links;
 
-            if (scrapperResult.Rating != null)
+            if (scrapeResult.Rating != null)
             {
-                gameMetadata.CommunityScore =  (int)(scrapperResult.Rating * 20);
+                gameMetadata.CommunityScore = (int)(scrapeResult.Rating * 20);
             }
 
             var publisher = _playniteApi.Database.Companies
@@ -129,23 +170,24 @@ namespace DLsiteLibrary
 
             gameMetadata.Publishers = new[] { pubProperty }.ToHashSet();
 
-            if (scrapperResult.ReleaseDate != null)
-                gameMetadata.ReleaseDate = new ReleaseDate(scrapperResult.ReleaseDate.Value);
+            if (scrapeResult.ReleaseDate != null)
+                gameMetadata.ReleaseDate = new ReleaseDate(scrapeResult.ReleaseDate.Value);
 
-            if (scrapperResult.Series != null)
+            if (scrapeResult.Series != null)
             {
                 var series = _playniteApi.Database.Series
                     .Where(x => x.Name is not null)
-                    .FirstOrDefault(series => series.Name.Equals(scrapperResult.Series, StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefault(series =>
+                        series.Name.Equals(scrapeResult.Series, StringComparison.OrdinalIgnoreCase));
 
                 MetadataProperty seriesProperty = series is null
-                    ? new MetadataNameProperty(scrapperResult.Series)
+                    ? new MetadataNameProperty(scrapeResult.Series)
                     : new MetadataIdProperty(series.Id);
                 gameMetadata.Series = new[] { seriesProperty }.ToHashSet();
             }
 
-            gameMetadata.CoverImage = new MetadataFile(scrapperResult.MainImage);
-            gameMetadata.BackgroundImage = new MetadataFile(scrapperResult.ProductImages[0]);
+            gameMetadata.CoverImage = new MetadataFile(scrapeResult.MainImage);
+            gameMetadata.BackgroundImage = new MetadataFile(scrapeResult.ProductImages[0]);
 
             return gameMetadata;
         }

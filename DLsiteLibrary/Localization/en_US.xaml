@@ -5,10 +5,14 @@
     <sys:String x:Key="LOC_Login_LoggedIn">Authenticated</sys:String>
     <sys:String x:Key="LOC_Login_NotLoggedIn">Requires authentication</sys:String>
     <sys:String x:Key="LOC_Login_Error">Authentication failed</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_PageLanguage">Page Language:</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_AssignGenres">Assign DLsite genres to:</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_AssignLanguages">Assign Supported languages to:</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_Illustrators">Include Illustrators as Developers</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_ScenarioWriters">Include Scenario Writers as Developers</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_MusicCreators">Include Music Creators as Developers</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_VoiceActors">Include Voice Actors as Developers</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_ProductFormat">Include Product Format as Features</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_FileFormat">Include File Format as Features</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_AssignFormatToGenres">Assign Game Product Format to Genres</sys:String>
 </ResourceDictionary>

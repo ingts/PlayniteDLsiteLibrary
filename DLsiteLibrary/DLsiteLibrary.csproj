@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+      <Reference Include="Newtonsoft.Json">
+          <HintPath>..\DLsiteMetadata\source\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -52,8 +55,14 @@
     <Compile Include="..\DLsiteMetadata\source\DLsiteScrapperResult.cs">
       <Link>DLsiteScrapperResult.cs</Link>
     </Compile>
-    <Compile Include="..\DLsiteMetadata\source\SupportedLanguages.cs">
+      <Compile Include="..\DLsiteMetadata\source\Enums\SupportedLanguages.cs">
       <Link>SupportedLanguages.cs</Link>
+      </Compile>
+      <Compile Include="..\DLsiteMetadata\source\Exceptions\ProductUnavailableException.cs">
+          <Link>ProductUnavailableException.cs</Link>
+      </Compile>
+      <Compile Include="..\DLsiteMetadata\source\TranslationDictionary.cs">
+          <Link>TranslationDictionary.cs</Link>
     </Compile>
     <Compile Include="DLsiteLibrary.cs" />
     <Compile Include="DLsiteLibrarySettings.cs" />

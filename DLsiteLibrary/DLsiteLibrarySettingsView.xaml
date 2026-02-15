@@ -14,7 +14,7 @@
             <TextBlock Margin="10 0 0 0" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
-                        <Setter Property="Text" Value="{DynamicResource LOC_Login_NotLoggedIn}"></Setter>
+                        <Setter Property="Text" Value="{DynamicResource LOC_Login_NotLoggedIn}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding AuthStatus}"
                                          Value="{x:Static dLsiteLibrary:AuthStatus.Ok}">
@@ -30,9 +30,22 @@
             </TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
-            <TextBlock Text="Page Language:" Margin="0, 0, 5, 0" />
+            <TextBlock Text="{DynamicResource LOCDLsiteLibrary_Settings_PageLanguage}" Margin="0, 0, 5, 0"
+                       VerticalAlignment="Center" />
             <ComboBox ItemsSource="{Binding Settings.AvailableLanguages}"
                       SelectedValue="{Binding Settings.PageLanguage}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+            <TextBlock Text="{DynamicResource LOCDLsiteLibrary_Settings_AssignGenres}" Margin="0, 0, 5, 0"
+                       VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding Settings.AvailableCategoryMappingTarget}"
+                      SelectedValue="{Binding Settings.CategoryMappingTarget}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0 10 0 0">
+            <TextBlock Text="{DynamicResource LOCDLsiteLibrary_Settings_AssignLanguages}" Margin="0, 0, 5, 0"
+                       VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding Settings.AvailableSupportedLanguagesMappingTarget}"
+                      SelectedValue="{Binding Settings.SupportedLanguagesMappingTarget}" />
         </StackPanel>
 
         <CheckBox Content="{DynamicResource LOCDLsiteLibrary_Settings_Illustrators}" Margin="0, 5"
@@ -48,5 +61,7 @@
                   IsChecked="{Binding Settings.IncludeProductFormat}" />
         <CheckBox Content="{DynamicResource LOCDLsiteLibrary_Settings_FileFormat}" Margin="0, 0, 0, 5"
                   IsChecked="{Binding Settings.IncludeFileFormat}" />
+        <CheckBox Content="{DynamicResource LOCDLsiteLibrary_Settings_AssignFormatToGenres}" Margin="0, 0, 0, 5"
+                  IsChecked="{Binding Settings.AssignGameProductFormatToGenre}" />
     </StackPanel>
 </UserControl>
