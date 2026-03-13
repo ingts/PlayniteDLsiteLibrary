@@ -70,12 +70,19 @@ namespace DLsiteLibrary
                 return [];
             }
 
-            return boughtsResponse.Boughts.Select(s => new GameMetadata
-            {
-                GameId = s,
-                Source = new MetadataNameProperty("DLsite"),
-                IsInstalled = false
-            });
+            return boughtsResponse.Boughts
+                .Select(id =>
+                {
+                    var installDirectory =
+                        PlayniteApi.Database.Games.FirstOrDefault(g => g.GameId == id)?.InstallDirectory;
+                    return new GameMetadata
+                    {
+                        GameId = id,
+                        Source = new MetadataNameProperty("DLsite"),
+                        InstallDirectory = installDirectory ?? "",
+                        IsInstalled = installDirectory != null
+                    };
+                });
         }
 
         public override ISettings GetSettings(bool firstRunSettings)
@@ -91,6 +98,15 @@ namespace DLsiteLibrary
         public override LibraryMetadataProvider GetMetadataDownloader()
         {
             return new MetadataProvider(settings.Settings, PlayniteApi);
+        }
+
+        public override IEnumerable<Playnite.SDK.Plugins.InstallController> GetInstallActions(
+            GetInstallActionsArgs args)
+        {
+            if (args.Game.PluginId != Id)
+                yield break;
+
+            yield return new InstallController(settings.Settings, args.Game, PlayniteApi);
         }
     }
 }

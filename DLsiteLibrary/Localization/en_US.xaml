@@ -6,6 +6,7 @@
     <sys:String x:Key="LOC_Login_NotLoggedIn">Requires authentication</sys:String>
     <sys:String x:Key="LOC_Login_Error">Authentication failed</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_PageLanguage">Page Language:</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Settings_ExtractionDir">Archive extraction directory: </sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_AssignGenres">Assign DLsite genres to:</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_AssignLanguages">Assign Supported languages to:</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_Illustrators">Include Illustrators as Developers</sys:String>
@@ -15,4 +16,8 @@
     <sys:String x:Key="LOCDLsiteLibrary_Settings_ProductFormat">Include Product Format as Features</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_FileFormat">Include File Format as Features</sys:String>
     <sys:String x:Key="LOCDLsiteLibrary_Settings_AssignFormatToGenres">Assign Game Product Format to Genres</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Install_SplitArchive">Split archive was downloaded. {0} must be run manually</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Install_DownloadFailed">Failed to download {0} from DLsite</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Install_SelectFolder">Multiple folders within the archive were found. Select the one to use for install directory</sys:String>
+    <sys:String x:Key="LOCDLsiteLibrary_Install_SelectExe">Multiple exes were found. Select the one to use for the play action</sys:String>
 </ResourceDictionary>

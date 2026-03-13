@@ -34,6 +34,7 @@ namespace DLsiteLibrary
         private bool _includeFileFormat;
 
         private string _pageLanguage = "English";
+        private string _extractionDir;
 
         private string _categoryMappingTarget = "Genres";
         private string _supportedLanguagesMappingTarget = "None";
@@ -62,6 +63,12 @@ namespace DLsiteLibrary
         {
             get => _pageLanguage;
             set => SetValue(ref _pageLanguage, value);
+        }
+
+        public string ExtractionDir
+        {
+            get => _extractionDir;
+            set => SetValue(ref _extractionDir, value);
         }
 
         public bool IncludeIllustrators
